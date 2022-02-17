@@ -1,0 +1,136 @@
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <h4>Parámetros de Búsqueda</h4>
+    </div>
+    <div class="panel-body p-3">
+        <form>
+            <div class="row">
+                <div class="col-md-3 pb-3">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombreSearch" name="nombreSearch"
+                        [(ngModel)]="nombreSearch" placeholder="Ingrese el nombre">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1">
+                    <button type="button" (click)="search()" class="btn btn-primary ml-3">Consultar</button>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" (click)="cleanSearch()" class="btn btn-primary">Limpiar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <h4>Lista de usuarios</h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary ml-3" (click)="openModalNewUsuario()">Crear</button>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Rol</th>
+                    <th scope="col">Activo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let usuario of showedUsuarios" (click)="getInformation(usuario)">
+                    <th scope="row">{{usuario.idUsuario}}</th>
+                    <td>{{usuario.nombre}}</td>
+                    <td>{{usuario.idRol}}</td>
+                    <td>{{usuario.activo}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <ng-template #myModalInfo let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">Información del Usuario</h4>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <ul class="alert alert-danger" *ngIf="errores&&errores.length>0">
+                <li *ngFor="let err of errores">
+                    {{err}}
+                </li>
+            </ul>
+            <form #clienteForm="ngForm">
+                <div class="row" *ngIf="!isNew">
+                    <div class="col-md-12">
+                        <label for="idUsuario">Id</label>
+                        <input type="text" class="form-control" id="idUsuario"
+                            [(ngModel)]="usuarioSeleccionado.idUsuario" name="idUsuario" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" #nombre="ngModel"
+                            [(ngModel)]="usuarioSeleccionado.nombre" name="nombre" placeholder="Ingrese el nombre"
+                            required minlength="4">
+                        <div class="alert alert-danger" *ngIf="nombre.invalid && (nombre.dirty||nombre.touched)">
+                            <div *ngIf="nombre.errors&&nombre.errors.required">
+                                Nombre es requerido
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="rol">Rol</label>
+                        <select [(ngModel)]="usuarioSeleccionado.idRol" class="form-select"
+                            aria-label="Default select example" name="rol" #rol="ngModel">
+                            <option *ngFor="let rol of roles" [value]="rol.idRol">{{rol.nombre}}</option>
+                        </select>
+                        <div class="alert alert-danger"
+                            *ngIf="usuarioSeleccionado.idRol===-1 && (rol.dirty||rol.touched)">
+                            Rol es requerido
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="activo" id="activo" value="A"
+                                [(ngModel)]="usuarioSeleccionado.activo">
+                            <label class="form-check-label" for="inlineRadio1">Activo</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="activo" id="activo" value="I"
+                                [(ngModel)]="usuarioSeleccionado.activo">
+                            <label class="form-check-label" for="inlineRadio2">Inactivo</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <div class="row">
+                <div class="col-md-4" *ngIf="isNew">
+                    <button type="button" (click)="create()" class="btn btn-primary" [disabled]="!clienteForm.form.valid
+                ||usuarioSeleccionado.idRol===-1||usuarioSeleccionado.activo===''">Guardar</button>
+                </div>
+                <div class="col-md-4" *ngIf="!isNew">
+                    <button type="button" (click)="update()" class="btn btn-primary" [disabled]="!clienteForm.form.valid
+                ||usuarioSeleccionado.idRol===-1||usuarioSeleccionado.activo===''">Editar</button>
+                </div>
+                <div class="col-md-4" *ngIf="!isNew">
+                    <button type="submit" (click)="delete()" class="btn btn-primary">Eliminar</button>
+                </div>
+            </div>
+            <!--<button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Ok</button>-->
+        </div>
+    </ng-template>
